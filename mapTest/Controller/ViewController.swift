@@ -56,12 +56,12 @@ class ViewController: UIViewController {
         ])
         
         searchButton.addTarget(self, action: #selector(searchCity), for: .touchUpInside)
+        
+   
     }
     
     @objc func searchCity(){
-        
-        print("city")
-        
+        print(searchInput.text ?? "rien")
     }
 }
 
