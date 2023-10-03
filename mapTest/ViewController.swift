@@ -8,10 +8,60 @@ class ViewController: UIViewController {
     var mapView = MKMapView()
     var locationManager = CLLocationManager()
     
+    var searchInput = UITextField()
+    var searchButton = UIButton()
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupMap()
         setupCL()
+        setupSearchModule()
+    }
+    
+    func setupSearchModule(){
+        setupSearchButton()
+        setupSearchInput()
+    }
+    
+    func setupSearchButton(){
+        view.addSubview(searchButton)
+        searchButton.backgroundColor = .red
+        searchButton.tintColor = .white
+        searchButton.setTitle("Search   ", for: .normal)
+        
+        searchButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            searchButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10),
+            searchButton.topAnchor.constraint(equalTo: view.topAnchor, constant:  75),
+            searchButton.widthAnchor.constraint(equalToConstant: 75),
+            searchButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+    }
+    func setupSearchInput(){
+        view.addSubview(searchInput)
+        searchInput.backgroundColor = .white
+        searchInput.placeholder = "Lookin for a city"
+        searchInput.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            
+            searchInput.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10),
+            searchInput.topAnchor.constraint(equalTo: view.topAnchor, constant:  75),
+            searchInput.widthAnchor.constraint(equalToConstant: 300),
+            searchInput.heightAnchor.constraint(equalToConstant: 44)
+            
+        ])
+        
+        searchButton.addTarget(self, action: #selector(searchCity), for: .touchUpInside)
+    }
+    
+    @objc func searchCity(){
+        
+        print("city")
+        
     }
 }
 
@@ -30,17 +80,17 @@ extension ViewController: MKMapViewDelegate{
             mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
-
+        
         
         addAnnotation("Strasbourg", "info", 48.5870262, 7.7530259)
         
         addAnnotation("Paris", "Panthéon", 48.866667, 2.333333)
-    
+        
     }
     
     
     func addAnnotation(_ title:String, _ subtitle:String,_ latitude: CLLocationDegrees,_ longitude:CLLocationDegrees){
-    
+        
         
         let annotation = MKPointAnnotation()
         
@@ -49,12 +99,11 @@ extension ViewController: MKMapViewDelegate{
         annotation.coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         
         mapView.addAnnotation(annotation)
-
+        
     }
     
 }
 extension ViewController: CLLocationManagerDelegate {
-    
     func setupCL(){
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
@@ -63,17 +112,22 @@ extension ViewController: CLLocationManagerDelegate {
     
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-       
+        
         guard let location = locations.last else{
             return
         }
         
-        print(location.coordinate.latitude, location.coordinate.longitude)
-
+        addAnnotation("Apple", "siège", location.coordinate.latitude, location.coordinate.longitude)
     }
     
-    
-    
-    
-    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse {
+            mapView.showsUserLocation = true
+            if let coordinate = locationManager.location?.coordinate {
+                let regionRadius: CLLocationDistance = 15000
+                let coordinateRegion = MKCoordinateRegion(center: coordinate, latitudinalMeters: regionRadius, longitudinalMeters: regionRadius)
+                mapView.setRegion(coordinateRegion, animated: true)
+            }
+        }
+    }
 }
