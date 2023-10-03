@@ -61,7 +61,34 @@ class ViewController: UIViewController {
     }
     
     @objc func searchCity(){
-        print(searchInput.text ?? "rien")
+       
+        guard let city = searchInput.text else {
+            return
+        }
+        
+        fetchDataFromAPI(city){
+            apiResponse in
+            DispatchQueue.main.async {
+                if let apiResponse = apiResponse {
+                    
+                    self.mapView.removeAnnotations(self.mapView.annotations)
+                    
+                    for city in apiResponse.features {
+                        guard let latitude = city.geometry.coordinates.last, let longitude = city.geometry.coordinates.first else{
+                            return
+                        }
+                        
+                        self.addAnnotation(city.properties.name, city.properties.context, latitude, longitude)
+                    }
+                    
+                
+                }
+            }
+            
+            
+                
+         
+        }
     }
 }
 
