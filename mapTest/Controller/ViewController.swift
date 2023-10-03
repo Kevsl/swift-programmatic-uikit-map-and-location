@@ -115,6 +115,22 @@ extension ViewController: MKMapViewDelegate{
         
     }
     
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            let identifier = "pin"
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+
+            if annotationView == nil {
+                annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                annotationView?.canShowCallout = true
+                let button = UIButton(type: .detailDisclosure)
+                annotationView?.rightCalloutAccessoryView = button
+            } else {
+                annotationView?.annotation = annotation
+            }
+
+            return annotationView
+        }
+    
     
     func addAnnotation(_ title:String, _ subtitle:String,_ latitude: CLLocationDegrees,_ longitude:CLLocationDegrees){
         
